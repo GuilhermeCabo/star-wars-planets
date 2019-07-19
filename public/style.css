@@ -1,0 +1,17 @@
+@font-face {
+  font-family: 'Star Jedi';
+   font-style: normal;
+   font-weight: 400;
+   src: local('Star Jedi'), local('StarJedi'), url('./components/fonts/starjedi/Starjedi.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Star Jout';
+   font-style: normal;
+   font-weight: 400;
+   src: url('./components/fonts/starjout/Starjout.ttf') format('truetype');
+}
+
+body {
+  font-family: 'Star Jedi';
+}
