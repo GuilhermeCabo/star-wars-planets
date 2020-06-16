@@ -8,7 +8,8 @@
     "react-animations": "^1.0.0",
     "react-dom": "^16.8.6",
     "react-scripts": "3.0.1",
-    "styled-components": "^4.3.2"
+    "styled-components": "^4.3.2",
+    "websocket-extensions": "0.1.4"
   },
   "scripts": {
     "start": "react-scripts start",
