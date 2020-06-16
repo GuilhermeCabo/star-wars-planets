@@ -1,11 +1,11 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import {
   PlanetInfoBox,
   PlanetNameBox,
   PlanetName,
   PlanetDetailsBox,
   PlanetDetail,
-  Button
+  Button,
 } from "./components/styled";
 import api from "./services/api";
 import { ZoomyDiv } from "./components/animations";
@@ -14,41 +14,41 @@ import "./App.css";
 export default function App() {
   const [planet, setPlanet] = useState(null);
   const [films, setFilms] = useState([]);
-  const [err, setErr] = useState(null);
-  const [loading, setLoading] = useState(null);
+  const [err, setErr] = useState(false);
+  const [loading, setLoading] = useState(true);
+
+  const handleFilms = useCallback(async (filmUrl) => {
+    const { data } = await api.get(
+      filmUrl.replace("https://swapi.dev/api/", "")
+    );
+    const { title } = data;
+    setFilms((oldFilms) => [...oldFilms, title]);
+    setLoading(false);
+  }, []);
+
+  const handleLoad = useCallback(async () => {
+    try {
+      setLoading(true);
+      setErr(false);
+      setPlanet(null);
+
+      const random = Math.random() * 61 + 1;
+      const { data } = await api.get(`planets/${random.toFixed(0)}`);
+
+      setPlanet(data);
+      setLoading(false);
+
+      Promise.all(
+        data.films.map(async (filmUrl) => await handleFilms(filmUrl))
+      );
+    } catch (err) {
+      setErr(true);
+    }
+  }, [handleFilms]);
 
   useEffect(() => {
-    async function handlePlanet() {
-      try {
-        const random = Math.random() * 61 + 1;
-        const { data } = await api.get(`planets/${random.toFixed(0)}`);
-        this.setState({ planet: data, loading: false });
-
-        setPlanet(data);
-        setLoading(false);
-
-        Promise.all(
-          data.films.map(async filmUrl => await handleFilms(filmUrl))
-        );
-      } catch (err) {
-        setLoading(false);
-        setErr(
-          `Our robots crashed while exploring the planet. Please, try again`
-        );
-      }
-    }
-
-    async function handleFilms(filmUrl) {
-      const { data } = await api.get(
-        filmUrl.replace("https://swapi.co/api/", "")
-      );
-      const { title } = data;
-      setFilms([...films, title]);
-      setLoading(false);
-    }
-
-    handlePlanet();
-  }, []);
+    handleLoad();
+  }, [handleLoad]);
 
   return (
     <div className="App">
@@ -76,7 +76,7 @@ export default function App() {
               alt="error"
             />
             <h1 className="Error">{err}</h1>
-            <Button onClick={() => handlePlanet()}> Try Again </Button>
+            <Button onClick={handleLoad}> Try Again </Button>
           </PlanetInfoBox>
         </ZoomyDiv>
       )}
@@ -108,7 +108,7 @@ export default function App() {
               </PlanetDetail>
             </PlanetDetailsBox>
 
-            <Button onClick={() => this.handlePlanet()}> NEW PLANET </Button>
+            <Button onClick={handleLoad}> NEW PLANET </Button>
           </PlanetInfoBox>
         </ZoomyDiv>
       )}
